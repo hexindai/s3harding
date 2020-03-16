@@ -11,4 +11,12 @@ class MurmurHashShardingTest {
         val actual = sharding.getShardingTableName(shardingKey = "148407")
         assertEquals("New_V_FundIO_449", actual)
     }
+
+    @Test
+    fun `getShardingTableName with bad arguments`() {
+
+        assertThrows(AssertionError::class.java) {
+            MurmurHashSharding("New_V_FundIO_", -1, 10)
+        }
+    }
 }
