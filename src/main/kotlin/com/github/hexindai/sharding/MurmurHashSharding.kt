@@ -6,7 +6,7 @@ import java.util.*
 class MurmurHashSharding(
         tableNamePrefix: String,
         shardingCount: Int = 512,
-        numOfNodes: Int = 10
+        numOfNodesPerTable: Int = 10
 ) : Sharding {
 
     private val seed = 0x1234ABCD
@@ -15,14 +15,20 @@ class MurmurHashSharding(
 
     private val tableNames = mutableListOf<String>()
 
+    override val numberOfTable: Int
+        get() = tableNames.size
+
+    override val numberOfNode: Int
+        get() = nodes.size
+
     init {
-        assert(shardingCount > 0 && numOfNodes > 0) {
+        assert(shardingCount > 0 && numOfNodesPerTable > 0) {
             "Parameter shardingCount and numOfNodes may not less then zero"
         }
-        for (i in 0..shardingCount) {
+        for (i in 0 until shardingCount) {
             val tableName = "$tableNamePrefix${i+1}"
             tableNames.add(tableName)
-            for (n in 0..numOfNodes) {
+            for (n in 0 until numOfNodesPerTable) {
                 nodes[this.hash("${tableName.toLowerCase()}*$n")] = tableName
             }
         }
