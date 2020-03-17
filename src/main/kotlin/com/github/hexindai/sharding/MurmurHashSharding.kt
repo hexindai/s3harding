@@ -4,10 +4,12 @@ import org.apache.commons.codec.digest.MurmurHash2
 import java.util.*
 
 class MurmurHashSharding(
-        private val tableNamePrefix: String,
-        private val shardingCount: Int = 512,
-        private val numOfNodes: Int = 10
+        tableNamePrefix: String,
+        shardingCount: Int = 512,
+        numOfNodes: Int = 10
 ) : Sharding {
+
+    private val seed = 0x1234ABCD
 
     private val nodes: SortedMap<Long, String> = TreeMap()
 
@@ -18,7 +20,7 @@ class MurmurHashSharding(
             "Parameter shardingCount and numOfNodes may not less then zero"
         }
         for (i in 0..shardingCount) {
-            val tableName = "$tableNamePrefix$i"
+            val tableName = "$tableNamePrefix${i+1}"
             tableNames.add(tableName)
             for (n in 0..numOfNodes) {
                 nodes[this.hash("${tableName.toLowerCase()}*$n")] = tableName
@@ -28,7 +30,7 @@ class MurmurHashSharding(
 
     private fun hash(shardingKey: String): Long {
         val bytes = shardingKey.toByteArray(Charsets.UTF_8)
-        return MurmurHash2.hash64(bytes, bytes.size, 0x1234ABCD)
+        return MurmurHash2.hash64(bytes, bytes.size, seed)
     }
 
     override fun getShardingTableName(shardingKey: String): String {
