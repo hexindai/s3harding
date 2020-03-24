@@ -11,7 +11,7 @@ A sharding strategy based on MurmurHash algorithm which is used for generating s
 
 1. Register this interceptor
 
-```
+```xml
 <!-- mybatis-config.xml -->
 <plugins>
     <plugin interceptor="com.github.hexindai.s3harding.mybatis.ShardingInterceptor"/>
