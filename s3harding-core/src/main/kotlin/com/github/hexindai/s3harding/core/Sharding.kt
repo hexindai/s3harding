@@ -1,4 +1,4 @@
-package com.github.hexindai.sharding
+package com.github.hexindai.s3harding.core
 
 interface Sharding {
 

@@ -7,7 +7,9 @@
  * in the user manual at https://docs.gradle.org/5.4.1/userguide/multi_project_builds.html
  */
 
-rootProject.name = "simple-sharding"
+rootProject.name = "s3harding"
+
+include("s3harding-core", "s3harding-mybatis")
 
 pluginManagement {
     repositories {

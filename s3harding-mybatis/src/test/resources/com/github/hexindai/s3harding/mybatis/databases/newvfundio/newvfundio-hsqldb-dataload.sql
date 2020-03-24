@@ -1,0 +1,2 @@
+INSERT INTO New_V_FundIO(id, num) VALUES(1, 12.34);
+INSERT INTO New_V_FundIO_449(id, num) VALUES(1, 12.34);

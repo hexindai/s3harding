@@ -1,4 +1,4 @@
-package com.github.hexindai.sharding
+package com.github.hexindai.s3harding.core
 
 import org.apache.commons.codec.digest.MurmurHash2
 import java.util.*
