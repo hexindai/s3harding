@@ -6,8 +6,14 @@ import com.github.hexindai.s3harding.core.MurmurHashSharding
 import com.github.hexindai.s3harding.core.Sharding
 import com.github.hexindai.s3harding.core.annotation.S3harding
 import net.sf.jsqlparser.expression.Alias
+import net.sf.jsqlparser.expression.BinaryExpression
+import net.sf.jsqlparser.expression.ExpressionVisitorAdapter
+import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
+import net.sf.jsqlparser.schema.Column
 import net.sf.jsqlparser.schema.Table
+import net.sf.jsqlparser.statement.select.PlainSelect
 import net.sf.jsqlparser.statement.select.Select
 import net.sf.jsqlparser.util.deparser.SelectDeParser
 import org.apache.ibatis.executor.statement.BaseStatementHandler
@@ -15,6 +21,7 @@ import org.apache.ibatis.executor.statement.RoutingStatementHandler
 import org.apache.ibatis.executor.statement.StatementHandler
 import org.apache.ibatis.mapping.BoundSql
 import org.apache.ibatis.mapping.MappedStatement
+import org.apache.ibatis.ognl.ComparisonExpression
 import org.apache.ibatis.plugin.Interceptor
 import org.apache.ibatis.plugin.Intercepts
 import org.apache.ibatis.plugin.Invocation
@@ -26,6 +33,7 @@ import java.sql.Connection
 @Intercepts(Signature(type = StatementHandler::class, method = "prepare", args = [Connection::class, Integer::class]))
 class ShardingInterceptor: Interceptor {
 
+    @Throws(Exception::class)
     override fun intercept(invocation: Invocation): Any {
         val target = invocation.target
         var statementHandler: StatementHandler = target as StatementHandler
@@ -37,15 +45,22 @@ class ShardingInterceptor: Interceptor {
             val boundSql: BoundSql = statementHandler.boundSql
 
             val method: Method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
-            val annotation: S3harding = method.getAnnotation(S3harding::class.java)
-            val shardingKey = annotation.shardingKey
-            val tableName = annotation.tableName
-
-            val sharding: Sharding = MurmurHashSharding("New_V_FundIO_")
-            val shardingTableName = sharding.getShardingTableName(shardingKey)
+            val s3hardingAnnotation: S3harding = method.getAnnotation(S3harding::class.java)
+            val tableName = s3hardingAnnotation.tableName
+            val columnName = s3hardingAnnotation.columnName
 
             var boundSqlString = boundSql.sql
-            boundSqlString = replaceTableNameWithShardingTableNameInSql(boundSqlString, tableName, shardingTableName)
+
+            val shardingKey = getColumnValueFromSql(boundSqlString, columnName = columnName) ?: throw Exception(
+                    "SQL $boundSqlString does not contain column name $columnName"
+            )
+
+            val shardingTableName = generateTableNameByShardingKey(shardingKey)
+
+            boundSqlString = formatSql(
+                    sql = boundSqlString, fromTableName = tableName, toTableName = shardingTableName
+            )
+
             val declaredSqlField = BoundSql::class.java.getDeclaredField("sql")
             declaredSqlField.isAccessible = true
             declaredSqlField.set(boundSql, boundSqlString)
@@ -53,14 +68,34 @@ class ShardingInterceptor: Interceptor {
         return invocation.proceed()
     }
 
-    private fun replaceTableNameWithShardingTableNameInSql(sql: String, tableName: String, shardingTableName: String): String {
+    private fun generateTableNameByShardingKey(shardingKey: String): String {
+        val sharding: Sharding = MurmurHashSharding("New_V_FundIO_")
+        return sharding.getShardingTableName(shardingKey)
+    }
+
+    private fun getColumnValueFromSql(sql: String, columnName: String): String? {
+        var value: String? = null
+
+        val stmt = CCJSqlParserUtil.parse(sql) as Select
+        (stmt.selectBody as PlainSelect).where.accept(object : ExpressionVisitorAdapter() {
+            override fun visit(expr: EqualsTo) {
+                super.visit(expr)
+                if (expr.leftExpression.toString() == columnName) {
+                    value = expr.rightExpression.toString()
+                }
+            }
+        })
+        return value
+    }
+
+    private fun formatSql(sql: String, fromTableName: String, toTableName: String): String {
         val select = CCJSqlParserUtil.parse(sql) as Select
         val selectDeParser = object : SelectDeParser() {
             override fun visit(table: Table) {
                 when(table.name) {
-                    tableName -> {
-                        table.name = shardingTableName
-                        table.alias = table.alias ?: Alias(tableName)
+                    fromTableName -> {
+                        table.name = toTableName
+                        table.alias = table.alias ?: Alias(fromTableName)
                     }
                 }
             }

@@ -22,8 +22,8 @@ A sharding strategy based on MurmurHash algorithm which is used for generating s
 
 ```kotlin
 interface Mapper {
-    @S3harding(tableName = "New_V_FundIO", shardingKey = "148407")
-    @Select("select * from New_V_FundIO limit 1")
+    @S3harding(tableName = "New_V_FundIO", columnName = "id")
+    @Select("select * from New_V_FundIO where id = 148407 limit 1")
     fun getOneNewVFundIO(): NewVFundIO
 }
 ```

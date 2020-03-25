@@ -28,7 +28,7 @@ class ShardingInterceptorTest : BaseDataTest() {
         val openSession = sqlSessionFactory!!.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val io = mapper.getOneNewVFundIO()
-        assertEquals(NewVFundIO(1, BigDecimal("12.34")), io)
+        assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
     }
 
 }
