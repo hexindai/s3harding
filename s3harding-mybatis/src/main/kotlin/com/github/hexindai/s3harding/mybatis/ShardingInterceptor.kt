@@ -90,7 +90,7 @@ class ShardingInterceptor: Interceptor {
         while (declaredField == null && clazz != Any::class.java) {
             try {
                 declaredField = clazz.getDeclaredField(propertyName)
-            } catch (var4: NoSuchFieldException) {
+            } catch (_: NoSuchFieldException) {
                 clazz = clazz.superclass
             }
         }
