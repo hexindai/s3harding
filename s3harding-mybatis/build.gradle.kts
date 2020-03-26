@@ -1,9 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-
-    id("org.jetbrains.kotlin.jvm")
-
+    kotlin("jvm")
 }
 
 dependencies {

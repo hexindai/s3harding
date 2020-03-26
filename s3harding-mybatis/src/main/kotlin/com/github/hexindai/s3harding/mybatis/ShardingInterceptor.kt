@@ -6,12 +6,9 @@ import com.github.hexindai.s3harding.core.MurmurHashSharding
 import com.github.hexindai.s3harding.core.Sharding
 import com.github.hexindai.s3harding.core.annotation.S3harding
 import net.sf.jsqlparser.expression.Alias
-import net.sf.jsqlparser.expression.BinaryExpression
 import net.sf.jsqlparser.expression.ExpressionVisitorAdapter
-import net.sf.jsqlparser.expression.operators.relational.ComparisonOperator
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
-import net.sf.jsqlparser.schema.Column
 import net.sf.jsqlparser.schema.Table
 import net.sf.jsqlparser.statement.select.PlainSelect
 import net.sf.jsqlparser.statement.select.Select
@@ -21,12 +18,10 @@ import org.apache.ibatis.executor.statement.RoutingStatementHandler
 import org.apache.ibatis.executor.statement.StatementHandler
 import org.apache.ibatis.mapping.BoundSql
 import org.apache.ibatis.mapping.MappedStatement
-import org.apache.ibatis.ognl.ComparisonExpression
 import org.apache.ibatis.plugin.Interceptor
 import org.apache.ibatis.plugin.Intercepts
 import org.apache.ibatis.plugin.Invocation
 import org.apache.ibatis.plugin.Signature
-import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.sql.Connection
 
@@ -38,10 +33,10 @@ class ShardingInterceptor: Interceptor {
         val target = invocation.target
         var statementHandler: StatementHandler = target as StatementHandler
         if (target is RoutingStatementHandler) {
-            statementHandler = target.getDeclaredMemberProperty("delegate")
+            statementHandler = target.getDeclaredMemberProperty("delegate")!!
         }
         if (statementHandler is BaseStatementHandler) {
-            val mappedStatement: MappedStatement = statementHandler.getDeclaredMemberProperty( "mappedStatement")
+            val mappedStatement: MappedStatement = statementHandler.getDeclaredMemberProperty( "mappedStatement")!!
             val boundSql: BoundSql = statementHandler.boundSql
 
             val method: Method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
@@ -52,7 +47,7 @@ class ShardingInterceptor: Interceptor {
             var boundSqlString = boundSql.sql
 
             val shardingKey = getColumnValueFromSql(boundSqlString, columnName = columnName) ?: throw Exception(
-                    "SQL $boundSqlString does not contain column name $columnName"
+                    "SQL `$boundSqlString` does not contain column name `$columnName`"
             )
 
             val shardingTableName = generateTableNameByShardingKey(shardingKey)
@@ -116,20 +111,19 @@ class ShardingInterceptor: Interceptor {
         }
     }
 
-    private inline fun <reified R: Any> Any.getDeclaredMemberProperty(propertyName: String): R {
+    private inline fun <reified R: Any> Any.getDeclaredMemberProperty(propertyName: String): R? {
 
         var clazz = this.javaClass as Class<in Any>
-
-        var declaredField: Field? = null
-
-        while (declaredField == null && clazz != Any::class.java) {
+        while (clazz != Any::class.java) {
             try {
-                declaredField = clazz.getDeclaredField(propertyName)
+               val declaredField = clazz.getDeclaredField(propertyName)
+                declaredField.isAccessible = true
+                return declaredField.get(this) as R
             } catch (_: NoSuchFieldException) {
                 clazz = clazz.superclass
             }
         }
-        declaredField!!.isAccessible = true
-        return declaredField.get(this) as R
+        return null
     }
+
 }

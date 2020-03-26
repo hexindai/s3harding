@@ -1,8 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    // Apply the Kotlin JVM plugin to add support for Kotlin on the JVM.
-    id("org.jetbrains.kotlin.jvm")
+    kotlin("jvm")
 }
 
 dependencies {
