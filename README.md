@@ -33,7 +33,7 @@ database nodes.
 interface Mapper {
     @S3harding(tableName = "New_V_FundIO", columnName = "id")
     @Select("select * from New_V_FundIO where id = 148407 limit 1")
-    fun getOneNewVFundIO(): NewVFundIO
+    fun getOneNewVFundIO(): NewVFundIO?
 }
 ```
 

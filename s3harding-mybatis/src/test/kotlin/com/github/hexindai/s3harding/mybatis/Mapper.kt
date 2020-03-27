@@ -13,6 +13,6 @@ interface Mapper {
     fun getOneNewFundIOById(id: Int): NewVFundIO?
 
     @S3harding(tableName = "New_V_FundIO", columnName = "id")
-    @Select("select * from New_V_FundIO where id = #{id} limit 1")
+    @Select("select * from New_V_FundIO where id = #{id} and num = #{num} limit 1")
     fun getOneNewFundIOByData(data: SearchData): NewVFundIO?
 }

@@ -24,7 +24,7 @@ class ShardingInterceptorTest : BaseDataTest() {
     }
 
     @Test
-    fun `testShardingInterceptor with raw sql`() {
+    fun `testShardingInterceptor with getOneNewVFundIO`() {
         val openSession = sqlSessionFactory!!.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val io = mapper.getOneNewVFundIO()!!
@@ -32,7 +32,7 @@ class ShardingInterceptorTest : BaseDataTest() {
     }
 
     @Test
-    fun `testShardingInterceptor with sql which contains placeholder`() {
+    fun `testShardingInterceptor with getOneNewFundIOById`() {
         val openSession = sqlSessionFactory!!.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val io = mapper.getOneNewFundIOById(148407)
@@ -40,7 +40,7 @@ class ShardingInterceptorTest : BaseDataTest() {
     }
 
     @Test
-    fun `testShardingInterceptor with sql which use object parameter`() {
+    fun `testShardingInterceptor with getOneNewFundIOByData`() {
         val openSession = sqlSessionFactory!!.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val data = SearchData(148407, BigDecimal("12.34"))
