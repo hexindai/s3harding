@@ -6,6 +6,6 @@ interface Sharding {
 
     val numberOfNode: Int
 
-    fun getShardingTableName(shardingKey: String): String
+    fun getShardingTableName(shardKey: String): String
 
 }

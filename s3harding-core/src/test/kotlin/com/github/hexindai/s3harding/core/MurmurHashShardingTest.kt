@@ -21,7 +21,7 @@ class MurmurHashShardingTest {
     fun getShardingTableName() {
 
         val sharding: Sharding = MurmurHashSharding("New_V_FundIO_")
-        val actual = sharding.getShardingTableName(shardingKey = "148407")
+        val actual = sharding.getShardingTableName(shardKey = "148407")
         assertEquals("New_V_FundIO_449", actual)
 
     }

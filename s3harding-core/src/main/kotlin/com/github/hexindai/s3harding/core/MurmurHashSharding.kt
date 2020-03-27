@@ -39,9 +39,9 @@ class MurmurHashSharding(
         return MurmurHash2.hash64(bytes, bytes.size, seed)
     }
 
-    override fun getShardingTableName(shardingKey: String): String {
-        val hashShardingKey = this.hash(shardingKey)
-        val sortedMap = this.nodes.tailMap(hashShardingKey)
+    override fun getShardingTableName(shardKey: String): String {
+        val hashShardKey = this.hash(shardKey)
+        val sortedMap = this.nodes.tailMap(hashShardKey)
         if (sortedMap.isEmpty()) {
             return nodes[nodes.firstKey()]!!
         }

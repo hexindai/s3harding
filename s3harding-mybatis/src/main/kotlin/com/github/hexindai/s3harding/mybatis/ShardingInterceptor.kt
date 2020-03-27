@@ -46,11 +46,11 @@ class ShardingInterceptor: Interceptor {
 
             var boundSqlString = boundSql.sql
 
-            val shardingKey = getColumnValueFromSql(boundSqlString, columnName = columnName) ?: throw Exception(
+            val shardKey = generateShardKey(boundSql, columnName) ?: throw Exception(
                     "SQL `$boundSqlString` does not contain column name `$columnName`"
             )
 
-            val shardingTableName = generateTableNameByShardingKey(shardingKey)
+            val shardingTableName = generateTableNameByShardKey(shardKey)
 
             boundSqlString = formatSql(
                     sql = boundSqlString, fromTableName = tableName, toTableName = shardingTableName
@@ -63,9 +63,29 @@ class ShardingInterceptor: Interceptor {
         return invocation.proceed()
     }
 
-    private fun generateTableNameByShardingKey(shardingKey: String): String {
+    private fun generateShardKey(boundSql: BoundSql, columnName: String): String? {
+        val boundSqlString = boundSql.sql
+        var shardKey = getColumnValueFromSql(boundSqlString, columnName = columnName)
+        // if sql with parameter placeholder
+        if (shardKey == "?") {
+            for (parameterMapping in boundSql.parameterMappings) {
+                if (parameterMapping.property == columnName) {
+                    val parameterObject = boundSql.parameterObject
+                    shardKey = if (parameterObject::class.javaPrimitiveType != null) {
+                        parameterObject.toString()
+                    } else {
+                        parameterObject.getDeclaredMemberProperty<Any>(columnName)?.toString()
+                    }
+                    break
+                }
+            }
+        }
+        return shardKey
+    }
+
+    private fun generateTableNameByShardKey(shardKey: String): String {
         val sharding: Sharding = MurmurHashSharding("New_V_FundIO_")
-        return sharding.getShardingTableName(shardingKey)
+        return sharding.getShardingTableName(shardKey)
     }
 
     private fun getColumnValueFromSql(sql: String, columnName: String): String? {
@@ -102,12 +122,18 @@ class ShardingInterceptor: Interceptor {
     private fun getMapperMethodByMappedStatementId(mapId: String): Method? {
         val className = mapId.substringBeforeLast(".")
         val methodName = mapId.substringAfterLast(".")
-        val clazz: Class<*>
-        return try {
-            clazz = Class.forName(className)
-            clazz.getMethod(methodName)
+
+        try {
+            val clazz = Class.forName(className)
+            val methods = clazz.methods
+            for (method in methods) {
+                if (method.name == methodName) {
+                    return method
+                }
+            }
+            return null
         } catch (e: Exception) {
-            null
+            return null
         }
     }
 

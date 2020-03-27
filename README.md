@@ -5,7 +5,16 @@ s3harding
 
 ## Introduction
 
-A sharding strategy based on MurmurHash algorithm which is used for generating sharding table names
+A simple sharding strategy based on key sharding. 
+
+Rewriting SQL for sharding. We can custom any sharding strategy based shard key which is used for generating sharded SQL.
+Currently, shards are logical that all shards are in a database node(this is dumb). In future, it will support separate
+database nodes.
+
+### Features:
+
+* Key based sharding (hash based sharding)
+* Only one database node (dumb)
 
 ## Usage
 
