@@ -23,9 +23,17 @@ database nodes.
 ```xml
 <!-- mybatis-config.xml -->
 <plugins>
-    <plugin interceptor="com.github.hexindai.s3harding.mybatis.ShardingInterceptor"/>
+    <plugin interceptor="com.github.hexindai.s3harding.mybatis.ShardingInterceptor">
+        <property name="shardingClass" value="com.github.hexindai.s3harding.core.MurmurHashSharding"/>
+        <property name="tableNamePrefix" value="New_V_FundIO_"/>
+        <property name="shardingCount" value="512"/>
+        <property name="seed" value="12341234"/>
+        <property name="numOfNodesPerTable" value="5"/>
+    </plugin>
 </plugins>
 ```
+
+**Property `shardingClass` is a must, the others are optional which will be passed to "shardingClass" via `setProperties` method**
 
 2. Add `@S3harding` to your mapper method, SQL will be modified automatically
 

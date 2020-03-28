@@ -24,23 +24,26 @@ import org.apache.ibatis.plugin.Invocation
 import org.apache.ibatis.plugin.Signature
 import java.lang.reflect.Method
 import java.sql.Connection
+import java.util.*
 
 @Intercepts(Signature(type = StatementHandler::class, method = "prepare", args = [Connection::class, Integer::class]))
 class ShardingInterceptor: Interceptor {
 
+    private lateinit var sharding: Sharding
+
     @Throws(Exception::class)
     override fun intercept(invocation: Invocation): Any {
         val target = invocation.target
-        var statementHandler: StatementHandler = target as StatementHandler
+        var statementHandler = target as StatementHandler
         if (target is RoutingStatementHandler) {
             statementHandler = target.getDeclaredMemberProperty("delegate")!!
         }
         if (statementHandler is BaseStatementHandler) {
             val mappedStatement: MappedStatement = statementHandler.getDeclaredMemberProperty( "mappedStatement")!!
-            val boundSql: BoundSql = statementHandler.boundSql
+            val boundSql = statementHandler.boundSql
 
-            val method: Method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
-            val s3hardingAnnotation: S3harding = method.getAnnotation(S3harding::class.java)
+            val method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
+            val s3hardingAnnotation = method.getAnnotation(S3harding::class.java)
             val tableName = s3hardingAnnotation.tableName
             val columnName = s3hardingAnnotation.columnName
 
@@ -61,6 +64,14 @@ class ShardingInterceptor: Interceptor {
             declaredSqlField.set(boundSql, boundSqlString)
         }
         return invocation.proceed()
+    }
+
+    override fun setProperties(properties: Properties?) {
+        val prop = properties ?: Properties()
+        val shardingClass =  (prop["shardingClass"] ?: IllegalArgumentException("shardingClass is empty")) as String
+        val sharding = Class.forName(shardingClass).getConstructor().newInstance() as Sharding
+        sharding.setProperties(prop)
+        this.sharding = sharding
     }
 
     private fun generateShardKey(boundSql: BoundSql, columnName: String): String? {
@@ -84,13 +95,11 @@ class ShardingInterceptor: Interceptor {
     }
 
     private fun generateTableNameByShardKey(shardKey: String): String {
-        val sharding: Sharding = MurmurHashSharding("New_V_FundIO_")
         return sharding.getShardingTableName(shardKey)
     }
 
     private fun getColumnValueFromSql(sql: String, columnName: String): String? {
         var value: String? = null
-
         val stmt = CCJSqlParserUtil.parse(sql) as Select
         (stmt.selectBody as PlainSelect).where.accept(object : ExpressionVisitorAdapter() {
             override fun visit(expr: EqualsTo) {

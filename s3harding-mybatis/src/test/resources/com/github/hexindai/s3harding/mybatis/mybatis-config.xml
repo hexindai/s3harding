@@ -12,7 +12,13 @@
     </properties>
 
     <plugins>
-        <plugin interceptor="com.github.hexindai.s3harding.mybatis.ShardingInterceptor"/>
+        <plugin interceptor="com.github.hexindai.s3harding.mybatis.ShardingInterceptor">
+            <property name="shardingClass" value="com.github.hexindai.s3harding.core.MurmurHashSharding"/>
+            <property name="tableNamePrefix" value="New_V_FundIO_"/>
+            <property name="shardingCount" value="512"/>
+            <property name="seed" value="1234ABCD"/>
+            <property name="numOfNodesPerTable" value="10"/>
+        </plugin>
     </plugins>
 
     <environments default="development">

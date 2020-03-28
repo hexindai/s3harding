@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 
 class ShardingInterceptorTest : BaseDataTest() {
 
-    private var sqlSessionFactory: SqlSessionFactory? = null
+    private lateinit var sqlSessionFactory: SqlSessionFactory
 
     @BeforeEach
     fun setUp() {
@@ -19,13 +19,13 @@ class ShardingInterceptorTest : BaseDataTest() {
             sqlSessionFactory = SqlSessionFactoryBuilder().build(reader)
         }
 
-        runScript(sqlSessionFactory!!.configuration.environment.dataSource, NewVFundIO_DDL)
-        runScript(sqlSessionFactory!!.configuration.environment.dataSource, NewVFundIO_DML)
+        runScript(sqlSessionFactory.configuration.environment.dataSource, NewVFundIO_DDL)
+        runScript(sqlSessionFactory.configuration.environment.dataSource, NewVFundIO_DML)
     }
 
     @Test
     fun `testShardingInterceptor with getOneNewVFundIO`() {
-        val openSession = sqlSessionFactory!!.openSession()
+        val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val io = mapper.getOneNewVFundIO()!!
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
@@ -33,7 +33,7 @@ class ShardingInterceptorTest : BaseDataTest() {
 
     @Test
     fun `testShardingInterceptor with getOneNewFundIOById`() {
-        val openSession = sqlSessionFactory!!.openSession()
+        val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val io = mapper.getOneNewFundIOById(148407)
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
@@ -41,7 +41,7 @@ class ShardingInterceptorTest : BaseDataTest() {
 
     @Test
     fun `testShardingInterceptor with getOneNewFundIOByData`() {
-        val openSession = sqlSessionFactory!!.openSession()
+        val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val data = SearchData(148407, BigDecimal("12.34"))
         val io = mapper.getOneNewFundIOByData(data)

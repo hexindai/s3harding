@@ -3,13 +3,15 @@ package com.github.hexindai.s3harding.core
 import org.apache.commons.codec.digest.MurmurHash2
 import java.util.*
 
-class MurmurHashSharding(
-        tableNamePrefix: String,
-        shardingCount: Int = 512,
-        numOfNodesPerTable: Int = 10
-) : Sharding {
+class MurmurHashSharding : Sharding {
 
-    private val seed = 0x1234ABCD
+    private lateinit var tableNamePrefix: String
+
+    private var shardingCount = 512
+
+    private var numOfNodesPerTable = 10
+
+    private var seed = 0x00000000
 
     private val nodes: SortedMap<Long, String> = TreeMap()
 
@@ -21,7 +23,7 @@ class MurmurHashSharding(
     override val numberOfNode: Int
         get() = nodes.size
 
-    init {
+    private fun initThis() {
         assert(shardingCount > 0 && numOfNodesPerTable > 0) {
             "Parameter shardingCount and numOfNodes may not less then zero"
         }
@@ -48,4 +50,12 @@ class MurmurHashSharding(
         return nodes[sortedMap.firstKey()]!!
     }
 
+    override fun setProperties(properties: Properties?) {
+        if (properties == null) throw IllegalArgumentException("Properties for MurmurHashSharing is empty")
+        tableNamePrefix = properties["tableNamePrefix"] as String? ?: throw IllegalArgumentException("Property tableNamePrefix is empty")
+        shardingCount = (properties["shardingCount"] as String?)?.toIntOrNull() ?: throw IllegalArgumentException("Property shardingCount is empty")
+        seed = (properties["seed"] as String?)?.toIntOrNull(16) ?: throw IllegalArgumentException("Property seed is empty")
+        numOfNodesPerTable = (properties["numOfNodesPerTable"] as String?)?.toIntOrNull() ?: throw IllegalArgumentException("Property numOfNodesPerTable is empty")
+        initThis()
+    }
 }
