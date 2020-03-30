@@ -2,7 +2,6 @@
 
 package com.github.hexindai.s3harding.mybatis
 
-import com.github.hexindai.s3harding.core.MurmurHashSharding
 import com.github.hexindai.s3harding.core.Sharding
 import com.github.hexindai.s3harding.core.annotation.S3harding
 import net.sf.jsqlparser.expression.Alias
@@ -39,7 +38,7 @@ class ShardingInterceptor: Interceptor {
             statementHandler = target.getDeclaredMemberProperty("delegate")!!
         }
         if (statementHandler is BaseStatementHandler) {
-            val mappedStatement: MappedStatement = statementHandler.getDeclaredMemberProperty( "mappedStatement")!!
+            val mappedStatement: MappedStatement = statementHandler.getDeclaredMemberProperty("mappedStatement")!!
             val boundSql = statementHandler.boundSql
 
             val method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
