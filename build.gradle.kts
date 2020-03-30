@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.3.70" apply false
+    kotlin("jvm") version "1.3.71" apply false
 }
 
 allprojects {
