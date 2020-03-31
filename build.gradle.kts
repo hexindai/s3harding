@@ -10,12 +10,7 @@ allprojects {
     version = "0.0.1-SNAPSHOT"
 
     repositories {
-        maven {
-            url = uri("https://maven.aliyun.com/nexus/content/repositories/central")
-        }
-        jcenter {
-            url = uri("https://maven.aliyun.com/repository/jcenter")
-        }
+        mavenCentral()
     }
 
     tasks.withType<KotlinCompile>().configureEach {

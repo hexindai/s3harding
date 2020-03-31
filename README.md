@@ -1,6 +1,8 @@
 s3harding
 ===
 
+[![Github Workflows](https://github.com/hexindai/s3harding/workflows/ci-with-gradle/badge.svg)](https://github.com/hexindai/s3harding/actions?query=workflow%3Aci-with-gradle)
+
 **Work in progress. Do not use it in a production deployment. 😄**
 
 ## Introduction
