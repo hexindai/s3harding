@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("org.jetbrains.dokka")
     `maven-publish`
 }
 
@@ -28,8 +29,20 @@ tasks.test {
     }
 }
 
+tasks.dokka {
+    outputFormat = "html"
+    outputDirectory = "$buildDir/javadoc"
+}
+
 val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
     from(sourceSets.main.get().allSource)
+}
+
+val dokkaJar by tasks.registering(Jar::class) {
+    description = "Assembles Kotlin docs with Dokka"
+    archiveClassifier.set("javadoc")
+    from(tasks.dokka)
 }
 
 publishing {
@@ -48,6 +61,8 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             from(components["java"])
+            artifact(sourcesJar.get())
+            artifact(dokkaJar.get())
         }
     }
 }
