@@ -58,7 +58,7 @@ publishing {
             artifact(dokkaJar.get())
 
             pom {
-                name.set(project.name)
+                name.set("s3harding core")
                 description.set("S3harding: A sharding library for Mybatis")
                 url.set("https://github.com/hexindai/s3harding")
 
