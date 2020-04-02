@@ -63,6 +63,33 @@ publishing {
             from(components["java"])
             artifact(sourcesJar.get())
             artifact(dokkaJar.get())
+
+            pom {
+                name.set(project.name)
+                description.set("S3harding: A sharding library for Mybatis")
+                url.set("https://github.com/hexindai/s3harding")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("Runrioter")
+                        name.set("Runrioter Wung")
+                        email.set("runrioter@gmail.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:git://github.com/hexindai/s3harding.git")
+                    developerConnection.set("scm:git:ssh://github.com:hexindai/s3harding.git")
+                    url.set("https://github.com/hexindai/s3harding/tree/master/s3harding-mybatis")
+                }
+            }
         }
     }
 }
