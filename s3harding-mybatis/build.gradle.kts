@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka")
     `maven-publish`
+    signing
 }
 
 dependencies {
@@ -48,12 +49,28 @@ val dokkaJar by tasks.registering(Jar::class) {
 publishing {
 
     repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/hexindai/s3harding")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+        if (project.hasProperty("isOSSRH")) {
+            maven {
+                name = "OSSRH"
+                url = if (version.toString().endsWith("SHAPSHOT")) {
+                    uri("https://oss.sonatype.org/content/repositories/snapshots")
+                } else {
+                    uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                }
+                credentials {
+                    username = project.findProperty("ossrh.user") as String? ?: System.getenv("OSSRH_USERNAME")
+                    password = project.findProperty("ossrh.key") as String? ?: System.getenv("OSSRH_TOKEN")
+                }
+            }
+        }
+        if (project.hasProperty("isGPR")) {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/hexindai/s3harding")
+                credentials {
+                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                }
             }
         }
     }
@@ -92,4 +109,8 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    sign(publishing.publications["gpr"])
 }
