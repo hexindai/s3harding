@@ -105,5 +105,8 @@ publishing {
 }
 
 signing {
+    val signingKey = System.getenv("PGP_PRIVATE_KEY")
+    val signingPassword = System.getenv("PGP_PRIVATE_KEY_PASSWORD")
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications["gpr"])
 }
