@@ -8,7 +8,7 @@ plugins {
 allprojects {
 
     group = "com.github.hexindai.s3harding"
-    version = "0.0.2"
+    version = "0.0.3"
 
     repositories {
         mavenCentral()
