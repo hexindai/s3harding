@@ -41,3 +41,5 @@ jobs:
       env:
         USERNAME: ${{ secrets.USERNAME }}
         TOKEN: ${{ secrets.TOKEN }}
+        PGP_PRIVATE_KEY: ${{ secrets.PGP_PRIVATE_KEY }}
+        PGP_PRIVATE_KEY_PASSWORD: ${{ secrets.PGP_PRIVATE_KEY_PASSWORD }}
