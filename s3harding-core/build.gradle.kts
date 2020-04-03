@@ -45,7 +45,7 @@ publishing {
         if (project.hasProperty("isOSSRH")) {
             maven {
                 name = "OSSRH"
-                url = if (version.toString().endsWith("SHAPSHOT")) {
+                url = if (version.toString().endsWith("SNAPSHOT")) {
                     uri("https://oss.sonatype.org/content/repositories/snapshots")
                 } else {
                     uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
