@@ -43,8 +43,25 @@ class ShardingInterceptorTest : BaseDataTest() {
     fun `testShardingInterceptor with getOneNewFundIOByData`() {
         val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
-        val data = SearchData(148407, BigDecimal("12.34"))
+        val data = SearchData(148407, BigDecimal("12.34"), 0)
         val io = mapper.getOneNewFundIOByData(data)
+        assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
+    }
+
+    @Test
+    fun `testShardingInterceptor with getOneNewFundIOByData2`() {
+        val openSession = sqlSessionFactory.openSession()
+        val mapper = openSession.getMapper(Mapper::class.java)
+        val data = SearchData(148407, BigDecimal("12.34"), 148407)
+        val io = mapper.getOneNewFundIOByData2(data)
+        assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
+    }
+
+    @Test
+    fun `testShardingInterceptor with getOneNewFundIOByFromUserId`() {
+        val openSession = sqlSessionFactory.openSession()
+        val mapper = openSession.getMapper(Mapper::class.java)
+        val io = mapper.getOneNewFundIOByFromUserId(148407)
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
     }
 

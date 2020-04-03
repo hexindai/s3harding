@@ -78,13 +78,20 @@ class ShardingInterceptor: Interceptor {
         var shardKey = getColumnValueFromSql(boundSqlString, columnName = columnName)
         // if sql with parameter placeholder
         if (shardKey == "?") {
+            shardKey = null // null means shardKey have not been generated or generated failed
             for (parameterMapping in boundSql.parameterMappings) {
                 if (parameterMapping.property == columnName) {
                     val parameterObject = boundSql.parameterObject
-                    shardKey = if (parameterObject::class.javaPrimitiveType != null) {
-                        parameterObject.toString()
-                    } else {
-                        parameterObject.getDeclaredMemberProperty<Any>(columnName)?.toString()
+                    shardKey = when {
+                        parameterObject::class.javaPrimitiveType != null -> {
+                            parameterObject.toString()
+                        }
+                        parameterObject is Map<*, *> -> {
+                            parameterObject[columnName].toString()
+                        }
+                        else -> {
+                            parameterObject.getDeclaredMemberProperty<Any>(columnName)?.toString()
+                        }
                     }
                     break
                 }

@@ -37,7 +37,7 @@ jobs:
       run: ./gradlew build
 
     - name: Publish with Gradle
-      run: ./gradlew publish -PisOSSRH=true
+      run: ./gradlew publish
       env:
         USERNAME: ${{ secrets.USERNAME }}
         TOKEN: ${{ secrets.TOKEN }}
