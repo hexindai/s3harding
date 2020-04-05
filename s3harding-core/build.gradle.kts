@@ -97,7 +97,7 @@ publishing {
 
                 scm {
                     connection.set("scm:git:git://github.com/hexindai/s3harding.git")
-                    developerConnection.set("scm:git:ssh://github.com:hexindai/s3harding.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:hexindai/s3harding.git")
                     url.set("https://github.com/hexindai/s3harding/tree/master/s3harding-core")
                 }
             }
