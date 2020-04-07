@@ -35,13 +35,3 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew build
-
-    - name: Publish with Gradle
-      run: ./gradlew publish
-      env:
-        USERNAME: ${{ secrets.USERNAME }}
-        TOKEN: ${{ secrets.TOKEN }}
-        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-        OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
-        PGP_PRIVATE_KEY: ${{ secrets.PGP_PRIVATE_KEY }}
-        PGP_PRIVATE_KEY_PASSWORD: ${{ secrets.PGP_PRIVATE_KEY_PASSWORD }}

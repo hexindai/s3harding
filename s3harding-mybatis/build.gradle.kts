@@ -46,31 +46,34 @@ val dokkaJar by tasks.registering(Jar::class) {
     from(tasks.dokka)
 }
 
-fun isSnapshot() = version.toString().endsWith("SNAPSHOT")
-
 publishing {
 
     repositories {
-        maven {
-            name = "OSSRH"
-            url = if (isSnapshot()) {
-                uri("https://oss.sonatype.org/content/repositories/snapshots")
-            } else {
-                uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
-            }
-            credentials {
-                username = project.findProperty("ossrh.user") as String? ?: System.getenv("OSSRH_USERNAME")
-                password = project.findProperty("ossrh.key") as String? ?: System.getenv("OSSRH_TOKEN")
-            }
-        }
-        // currently Github package registry does't support, so we do not push snapshot
-        if (!isSnapshot()) {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/hexindai/s3harding")
+        when(project.findProperty("release")) {
+            "SNAPSHOT" -> maven {
+                name = "OSSRH-SNAPSHOT"
+                url = uri("https://oss.sonatype.org/content/repositories/snapshots")
                 credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                    username = project.findProperty("ossrh.user") as String? ?: System.getenv("OSSRH_USERNAME")
+                    password = project.findProperty("ossrh.key") as String? ?: System.getenv("OSSRH_TOKEN")
+                }
+            }
+            "GA" -> {
+                maven {
+                    name = "OSSRH-GA"
+                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                    credentials {
+                        username = project.findProperty("ossrh.user") as String? ?: System.getenv("OSSRH_USERNAME")
+                        password = project.findProperty("ossrh.key") as String? ?: System.getenv("OSSRH_TOKEN")
+                    }
+                }
+                maven {
+                    name = "GitHubPackages"
+                    url = uri("https://maven.pkg.github.com/hexindai/s3harding")
+                    credentials {
+                        username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
+                        password = project.findProperty("gpr.key") as String? ?: System.getenv("TOKEN")
+                    }
                 }
             }
         }
