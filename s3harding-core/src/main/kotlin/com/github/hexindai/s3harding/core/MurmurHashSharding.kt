@@ -3,7 +3,7 @@ package com.github.hexindai.s3harding.core
 import org.apache.commons.codec.digest.MurmurHash2
 import java.util.*
 
-class MurmurHashSharding : Sharding {
+open class MurmurHashSharding : Sharding {
 
     private lateinit var tableNamePrefix: String
 
