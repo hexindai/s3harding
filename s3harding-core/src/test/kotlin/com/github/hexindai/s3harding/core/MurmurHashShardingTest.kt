@@ -8,7 +8,7 @@ import java.util.*
 
 class MurmurHashShardingTest {
 
-    private lateinit var sharding: Sharding
+    private lateinit var sharding: ConfigurableSharding
 
     @BeforeEach
     private fun setUp() {

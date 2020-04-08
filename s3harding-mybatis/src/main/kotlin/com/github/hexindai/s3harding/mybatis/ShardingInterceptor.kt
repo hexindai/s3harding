@@ -2,6 +2,7 @@
 
 package com.github.hexindai.s3harding.mybatis
 
+import com.github.hexindai.s3harding.core.ConfigurableSharding
 import com.github.hexindai.s3harding.core.Sharding
 import com.github.hexindai.s3harding.core.annotation.S3harding
 import net.sf.jsqlparser.expression.Alias
@@ -68,7 +69,7 @@ class ShardingInterceptor: Interceptor {
     override fun setProperties(properties: Properties?) {
         val prop = properties ?: Properties()
         val shardingClass =  (prop["shardingClass"] ?: IllegalArgumentException("shardingClass is empty")) as String
-        val sharding = Class.forName(shardingClass).getConstructor().newInstance() as Sharding
+        val sharding = Class.forName(shardingClass).getConstructor().newInstance() as ConfigurableSharding
         sharding.setProperties(prop)
         this.sharding = sharding
     }

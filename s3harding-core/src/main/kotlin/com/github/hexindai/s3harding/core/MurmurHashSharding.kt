@@ -3,9 +3,11 @@ package com.github.hexindai.s3harding.core
 import org.apache.commons.codec.digest.MurmurHash2
 import java.util.*
 
-open class MurmurHashSharding : Sharding {
+open class MurmurHashSharding : ConfigurableSharding {
 
     private lateinit var tableNamePrefix: String
+
+    private var properties = Properties()
 
     private var shardingCount = 512
 
@@ -52,10 +54,19 @@ open class MurmurHashSharding : Sharding {
 
     override fun setProperties(properties: Properties?) {
         if (properties == null) throw IllegalArgumentException("Properties for MurmurHashSharing is empty")
+        this.properties = properties
         tableNamePrefix = properties["tableNamePrefix"] as String? ?: throw IllegalArgumentException("Property tableNamePrefix is empty")
         shardingCount = (properties["shardingCount"] as String?)?.toIntOrNull() ?: throw IllegalArgumentException("Property shardingCount is empty")
         seed = (properties["seed"] as String?)?.toIntOrNull(16) ?: throw IllegalArgumentException("Property seed is empty")
         numOfNodesPerTable = (properties["numOfNodesPerTable"] as String?)?.toIntOrNull() ?: throw IllegalArgumentException("Property numOfNodesPerTable is empty")
         initThis()
+    }
+
+    override fun getProperties(): Properties {
+        return this.properties
+    }
+
+    override fun getProperty(key: Any): Any? {
+        return this.properties[key]
     }
 }
