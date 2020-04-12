@@ -46,11 +46,13 @@ class ShardingInterceptor: Interceptor {
             val s3hardingAnnotation = method.getAnnotation(S3harding::class.java)
             val tableName = s3hardingAnnotation.tableName
             val columnName = s3hardingAnnotation.columnName
+            val paramName = s3hardingAnnotation.paramName
 
             var boundSqlString = boundSql.sql
 
-            val shardKey = generateShardKey(boundSql, columnName) ?: throw Exception(
-                    "SQL `$boundSqlString` does not contain column name `$columnName`"
+            val shardKey = generateShardKey(mappedStatement, boundSql, columnName, paramName) ?: throw Exception(
+                    "SQL `$boundSqlString` does not contain column name `$columnName` " +
+                            "or param name `$paramName` does not have value"
             )
 
             val shardingTableName = generateTableNameByShardKey(shardKey)
@@ -74,26 +76,33 @@ class ShardingInterceptor: Interceptor {
         this.sharding = sharding
     }
 
-    private fun generateShardKey(boundSql: BoundSql, columnName: String): String? {
+    private fun generateShardKey(
+            mappedStatement: MappedStatement,
+            boundSql: BoundSql,
+            columnName: String,
+            paramName: String
+    ): String? {
         val boundSqlString = boundSql.sql
-        var shardKey = getColumnValueFromSql(boundSqlString, columnName = columnName)
+        val parameterObject = boundSql.parameterObject
+        var shardKey: String? = getColumnValueFromSql(boundSqlString, columnName) ?: return null
         // if sql with parameter placeholder
         if (shardKey == "?") {
             shardKey = null // null means shardKey have not been generated or generated failed
             for (parameterMapping in boundSql.parameterMappings) {
-                if (parameterMapping.property == columnName) {
-                    val parameterObject = boundSql.parameterObject
-                    shardKey = when {
-                        parameterObject::class.javaPrimitiveType != null -> {
-                            parameterObject.toString()
-                        }
-                        parameterObject is Map<*, *> -> {
-                            parameterObject[columnName].toString()
-                        }
-                        else -> {
-                            parameterObject.getDeclaredMemberProperty<Any>(columnName)?.toString()
-                        }
+                val propertyName = parameterMapping.property
+                if (propertyName == paramName) {
+                    if (boundSql.hasAdditionalParameter(propertyName)) {
+                        shardKey = boundSql.getAdditionalParameter(propertyName).toString()
+                        break
                     }
+                    val configuration = mappedStatement.configuration
+                    val typeHandlerRegistry = configuration.typeHandlerRegistry
+                    if (typeHandlerRegistry.hasTypeHandler(parameterObject.javaClass)) {
+                        shardKey = parameterObject.toString()
+                        break
+                    }
+                    val metaObject = configuration.newMetaObject(parameterObject)
+                    shardKey = metaObject.getValue(propertyName).toString()
                     break
                 }
             }

@@ -35,7 +35,7 @@ class ShardingInterceptorTest : BaseDataTest() {
     fun `testShardingInterceptor with getOneNewFundIOById`() {
         val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
-        val io = mapper.getOneNewFundIOById(148407)
+        val io = mapper.getOneNewVFundIOById(148407)
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
     }
 
@@ -44,7 +44,7 @@ class ShardingInterceptorTest : BaseDataTest() {
         val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val data = SearchData(148407, BigDecimal("12.34"), 0)
-        val io = mapper.getOneNewFundIOByData(data)
+        val io = mapper.getOneNewVFundIOByData(data)
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
     }
 
@@ -53,7 +53,7 @@ class ShardingInterceptorTest : BaseDataTest() {
         val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
         val data = SearchData(148407, BigDecimal("12.34"), 148407)
-        val io = mapper.getOneNewFundIOByData2(data)
+        val io = mapper.getOneNewVFundIOByData2(data)
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
     }
 
@@ -61,7 +61,23 @@ class ShardingInterceptorTest : BaseDataTest() {
     fun `testShardingInterceptor with getOneNewFundIOByFromUserId`() {
         val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)
-        val io = mapper.getOneNewFundIOByFromUserId(148407)
+        val io = mapper.getOneNewVFundIOByFromUserId(148407)
+        assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
+    }
+
+    @Test
+    fun `testShardingInterceptor with getOneNewFundIOByFromUserIdWithParam`() {
+        val openSession = sqlSessionFactory.openSession()
+        val mapper = openSession.getMapper(Mapper::class.java)
+        val io = mapper.getOneNewVFundIOByFromUserIdWithParam(148407)
+        assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
+    }
+
+    @Test
+    fun `testShardingInterceptor with getOneNewVFundIOByFromUserIdWithParamAndColumnName`() {
+        val openSession = sqlSessionFactory.openSession()
+        val mapper = openSession.getMapper(Mapper::class.java)
+        val io = mapper.getOneNewVFundIOByFromUserIdWithParamAndColumnName(148407)
         assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
     }
 

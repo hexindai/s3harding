@@ -5,4 +5,8 @@ package com.github.hexindai.s3harding.core.annotation
 @Target(AnnotationTarget.FUNCTION)
 @Retention
 @MustBeDocumented
-annotation class S3harding(val tableName: String, val columnName: String)
+annotation class S3harding(
+        val tableName: String,
+        val columnName: String,
+        val paramName: String = ""
+)
