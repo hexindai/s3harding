@@ -43,7 +43,7 @@ class ShardingInterceptor: Interceptor {
             val boundSql = statementHandler.boundSql
 
             val method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
-            val s3hardingAnnotation = method.getAnnotation(S3harding::class.java)
+            val s3hardingAnnotation = method.getAnnotation(S3harding::class.java) ?: return invocation.proceed()
             val tableName = s3hardingAnnotation.tableName
             val columnName = s3hardingAnnotation.columnName
             val paramName = s3hardingAnnotation.paramName

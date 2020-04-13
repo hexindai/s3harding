@@ -32,6 +32,14 @@ class ShardingInterceptorTest : BaseDataTest() {
     }
 
     @Test
+    fun `testShardingInterceptor with getOneNewVFundIOWithoutS3harding`() {
+        val openSession = sqlSessionFactory.openSession()
+        val mapper = openSession.getMapper(Mapper::class.java)
+        val io = mapper.getOneNewVFundIOWithoutS3harding()!!
+        assertEquals(NewVFundIO(148407, BigDecimal("12.34")), io)
+    }
+
+    @Test
     fun `testShardingInterceptor with getOneNewFundIOById`() {
         val openSession = sqlSessionFactory.openSession()
         val mapper = openSession.getMapper(Mapper::class.java)

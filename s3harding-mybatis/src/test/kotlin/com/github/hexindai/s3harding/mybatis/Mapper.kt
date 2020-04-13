@@ -9,6 +9,9 @@ interface Mapper {
     @Select("select * from New_V_FundIO where id = 148407 limit 1")
     fun getOneNewVFundIO(): NewVFundIO?
 
+    @Select("select * from New_V_FundIO_449 where id = 148407 limit 1")
+    fun getOneNewVFundIOWithoutS3harding(): NewVFundIO?
+
     @S3harding(tableName = "New_V_FundIO", columnName = "id", paramName = "id")
     @Select("select * from New_V_FundIO where id = #{id} limit 1")
     fun getOneNewVFundIOById(id: Int): NewVFundIO?
