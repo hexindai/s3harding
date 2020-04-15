@@ -19,6 +19,8 @@ A simple key sharding interceptor for Mybatis.
 
 2. Register this interceptor
 
+  * use `mybatis-config.xml`
+
 ```xml
 <!-- mybatis-config.xml -->
 <plugins>
@@ -30,6 +32,26 @@ A simple key sharding interceptor for Mybatis.
         <property name="numOfNodesPerTable" value="5"/>
     </plugin>
 </plugins>
+```
+
+  * use Spring-Boot autoload interceptor if you use Spring
+
+```kotlin
+@Configuration
+class MybatisConfig {
+    @Bean
+    fun registerS3hardingInterceptor(): Interceptor {
+        val interceptor = ShardingInterceptor()
+        interceptor.setProperties(Properties().apply {
+            setProperty("shardingClass", "com.github.hexindai.s3harding.core.MurmurHashSharding")
+            setProperty("tableNamePrefix", "New_V_FundIO_")
+            setProperty("shardingCount", "512")
+            setProperty("seed", "12341234")
+            setProperty("numOfNodesPerTable", "5")
+        })
+        return interceptor
+    }
+}
 ```
 
 **Property `shardingClass` is a must, the others are optional which will be passed to "shardingClass" via `setProperties` method**

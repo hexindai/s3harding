@@ -75,7 +75,7 @@ class ShardingInterceptorTest : BaseDataTest() {
     }
 
     @Test
-    fun `InsertMapper_insertAndGetNewVFundIO`() {
+    fun `InsertMapper - insertAndGetNewVFundIO`() {
         val openSession = sqlSessionFactory.openSession()
         val insertMapper = openSession.getMapper(InsertMapper::class.java)
         val insertData = InsertData(num = BigDecimal("22.22"), fromUserId = 148407)
