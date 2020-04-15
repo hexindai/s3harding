@@ -11,15 +11,18 @@ dependencies {
     implementation(kotlin("reflect"))
 
     implementation(project(":s3harding-core"))
+    implementation(platform("org.testcontainers:testcontainers-bom:1.14.0"))
     implementation("org.mybatis:mybatis:3.5.4")
     implementation("com.github.jsqlparser:jsqlparser:3.1")
 
-    testImplementation("org.hsqldb:hsqldb:2.5.0")
     testImplementation("com.github.jsqlparser:jsqlparser:3.1")
 
     testImplementation(kotlin("test"))
     testImplementation(kotlin("test-junit"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.0")
+    testImplementation("org.testcontainers:mysql")
+    testImplementation("mysql:mysql-connector-java:8.0.19")
+    testImplementation("log4j:log4j:1.2.17")
 
 }
 
