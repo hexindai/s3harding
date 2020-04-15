@@ -43,6 +43,7 @@
         <mapper class="com.github.hexindai.s3harding.mybatis.SelectMapper" />
         <mapper class="com.github.hexindai.s3harding.mybatis.InsertMapper" />
         <mapper class="com.github.hexindai.s3harding.mybatis.UpdateMapper" />
+        <mapper class="com.github.hexindai.s3harding.mybatis.DeleteMapper" />
     </mappers>
 
 </configuration>

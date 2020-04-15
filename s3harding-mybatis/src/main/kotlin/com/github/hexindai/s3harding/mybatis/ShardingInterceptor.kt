@@ -11,6 +11,7 @@ import net.sf.jsqlparser.expression.operators.relational.EqualsTo
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList
 import net.sf.jsqlparser.parser.CCJSqlParserUtil
 import net.sf.jsqlparser.schema.Table
+import net.sf.jsqlparser.statement.delete.Delete
 import net.sf.jsqlparser.statement.insert.Insert
 import net.sf.jsqlparser.statement.select.PlainSelect
 import net.sf.jsqlparser.statement.select.Select
@@ -128,7 +129,8 @@ class ShardingInterceptor: Interceptor {
         var value: String? = null
         val stmt = CCJSqlParserUtil.parse(sql)
         if (sqlCommandType == SqlCommandType.SELECT) {
-            ((stmt as Select).selectBody as PlainSelect).where.accept(object : ExpressionVisitorAdapter() {
+            val selectStmt = stmt as Select
+            (selectStmt.selectBody as PlainSelect).where.accept(object : ExpressionVisitorAdapter() {
                 override fun visit(expr: EqualsTo) {
                     super.visit(expr)
                     if (expr.leftExpression.toString() == columnName) {
@@ -137,15 +139,26 @@ class ShardingInterceptor: Interceptor {
                 }
             })
         } else if (sqlCommandType == SqlCommandType.INSERT) {
-            val insert = stmt as Insert
-            for ((index, column) in insert.columns.withIndex()) {
+            val insertStmt = stmt as Insert
+            for ((index, column) in insertStmt.columns.withIndex()) {
                 if (column.columnName == columnName) {
-                    value = (insert.itemsList as ExpressionList).expressions[index].toString()
+                    value = (insertStmt.itemsList as ExpressionList).expressions[index].toString()
                     break
                 }
             }
         } else if (sqlCommandType == SqlCommandType.UPDATE) {
-            (stmt as Update).where.accept(object : ExpressionDeParser() {
+            val updateStmt = stmt as Update
+            updateStmt.where.accept(object : ExpressionDeParser() {
+                override fun visit(equalsTo: EqualsTo) {
+                    super.visit(equalsTo)
+                    if (equalsTo.leftExpression.toString() == columnName) {
+                        value = equalsTo.rightExpression.toString()
+                    }
+                }
+            })
+        } else if (sqlCommandType == SqlCommandType.DELETE) {
+            val deleteStmt = stmt as Delete
+            deleteStmt.where.accept(object : ExpressionDeParser() {
                 override fun visit(equalsTo: EqualsTo) {
                     super.visit(equalsTo)
                     if (equalsTo.leftExpression.toString() == columnName) {
@@ -180,6 +193,11 @@ class ShardingInterceptor: Interceptor {
             val updateStmt = stmt as Update
             if (updateStmt.table.name == fromTableName) {
                 updateStmt.table.name = toTableName
+            }
+        } else if (sqlCommandType == SqlCommandType.DELETE) {
+            val deleteStmt = stmt as Delete
+            if (deleteStmt.table.name == fromTableName) {
+                deleteStmt.table.name = toTableName
             }
         }
         return stmt.toString()

@@ -91,4 +91,12 @@ class ShardingInterceptorTest : BaseDataTest() {
         assertEquals(1, updated)
     }
 
+    @Test
+    fun `DeleteMapper - deleteNewVFundIOByFromUserId`() {
+        val openSession = sqlSessionFactory.openSession()
+        val deleteMapper = openSession.getMapper(DeleteMapper::class.java)
+        val deleted = deleteMapper.deleteNewVFundIOByFromUserId(148407)
+        assertEquals(1, deleted)
+    }
+
 }
