@@ -14,6 +14,8 @@ import net.sf.jsqlparser.schema.Table
 import net.sf.jsqlparser.statement.insert.Insert
 import net.sf.jsqlparser.statement.select.PlainSelect
 import net.sf.jsqlparser.statement.select.Select
+import net.sf.jsqlparser.statement.update.Update
+import net.sf.jsqlparser.util.deparser.ExpressionDeParser
 import net.sf.jsqlparser.util.deparser.SelectDeParser
 import org.apache.ibatis.executor.statement.BaseStatementHandler
 import org.apache.ibatis.executor.statement.RoutingStatementHandler
@@ -142,6 +144,15 @@ class ShardingInterceptor: Interceptor {
                     break
                 }
             }
+        } else if (sqlCommandType == SqlCommandType.UPDATE) {
+            (stmt as Update).where.accept(object : ExpressionDeParser() {
+                override fun visit(equalsTo: EqualsTo) {
+                    super.visit(equalsTo)
+                    if (equalsTo.leftExpression.toString() == columnName) {
+                        value = equalsTo.rightExpression.toString()
+                    }
+                }
+            })
         }
         return value
     }
@@ -149,7 +160,8 @@ class ShardingInterceptor: Interceptor {
     private fun formatSql(sql: String, fromTableName: String, toTableName: String, sqlCommandType: SqlCommandType): String {
         val stmt = CCJSqlParserUtil.parse(sql)
         if (sqlCommandType == SqlCommandType.SELECT) {
-            (stmt as Select).selectBody.accept(object : SelectDeParser() {
+            val selectStmt = stmt as Select
+            selectStmt.selectBody.accept(object : SelectDeParser() {
                 override fun visit(table: Table) {
                     when(table.name) {
                         fromTableName -> {
@@ -160,9 +172,14 @@ class ShardingInterceptor: Interceptor {
                 }
             })
         } else if (sqlCommandType == SqlCommandType.INSERT) {
-            val insert = stmt as Insert
-            if (insert.table.name == fromTableName) {
-                insert.table.name = toTableName
+            val insertStmt = stmt as Insert
+            if (insertStmt.table.name == fromTableName) {
+                insertStmt.table.name = toTableName
+            }
+        } else if (sqlCommandType == SqlCommandType.UPDATE) {
+            val updateStmt = stmt as Update
+            if (updateStmt.table.name == fromTableName) {
+                updateStmt.table.name = toTableName
             }
         }
         return stmt.toString()

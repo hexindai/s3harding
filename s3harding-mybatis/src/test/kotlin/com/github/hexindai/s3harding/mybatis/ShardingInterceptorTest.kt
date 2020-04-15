@@ -83,4 +83,12 @@ class ShardingInterceptorTest : BaseDataTest() {
         assertEquals(3, insertData.id)
     }
 
+    @Test
+    fun `UpdateMapper - updateNewVFundIOWithFromUserID`() {
+        val openSession = sqlSessionFactory.openSession()
+        val updateMapper = openSession.getMapper(UpdateMapper::class.java)
+        val updated = updateMapper.updateNewVFundIOWithFromUserID(148407)
+        assertEquals(1, updated)
+    }
+
 }
