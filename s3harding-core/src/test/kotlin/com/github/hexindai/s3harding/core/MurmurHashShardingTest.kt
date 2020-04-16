@@ -13,7 +13,7 @@ class MurmurHashShardingTest {
     @BeforeEach
     private fun setUp() {
         sharding = MurmurHashSharding()
-        sharding.setProperties(Properties().apply{
+        sharding.setProperties(Properties().apply {
             this["tableNamePrefix"] = "New_V_FundIO_"
             this["shardingCount"] = "512"
             this["seed"] = "1234ABCD"
@@ -43,7 +43,7 @@ class MurmurHashShardingTest {
     @Test
     fun `getShardingTableName with bad arguments`() {
         assertThrows(AssertionError::class.java) {
-            MurmurHashSharding().setProperties(Properties().apply{
+            MurmurHashSharding().setProperties(Properties().apply {
                 this["tableNamePrefix"] = "New_V_FundIO_"
                 this["shardingCount"] = "-1"
                 this["seed"] = "1234ABCD"

@@ -33,7 +33,7 @@ import java.sql.Connection
 import java.util.*
 
 @Intercepts(Signature(type = StatementHandler::class, method = "prepare", args = [Connection::class, Integer::class]))
-class ShardingInterceptor: Interceptor {
+class ShardingInterceptor : Interceptor {
 
     private lateinit var sharding: Sharding
 
@@ -50,6 +50,7 @@ class ShardingInterceptor: Interceptor {
 
             val method = getMapperMethodByMappedStatementId(mappedStatement.id) ?: return invocation.proceed()
             val s3hardingAnnotation = method.getAnnotation(S3harding::class.java) ?: return invocation.proceed()
+
             val tableName = s3hardingAnnotation.tableName
             val columnName = s3hardingAnnotation.columnName
             val paramName = s3hardingAnnotation.paramName
@@ -79,7 +80,7 @@ class ShardingInterceptor: Interceptor {
 
     override fun setProperties(properties: Properties?) {
         val prop = properties ?: Properties()
-        val shardingClass =  (prop["shardingClass"] ?: IllegalArgumentException("shardingClass is empty")) as String
+        val shardingClass = (prop["shardingClass"] ?: IllegalArgumentException("shardingClass is empty")) as String
         val sharding = Class.forName(shardingClass).getConstructor().newInstance() as ConfigurableSharding
         sharding.setProperties(prop)
         this.sharding = sharding
@@ -176,7 +177,7 @@ class ShardingInterceptor: Interceptor {
             val selectStmt = stmt as Select
             selectStmt.selectBody.accept(object : SelectDeParser() {
                 override fun visit(table: Table) {
-                    when(table.name) {
+                    when (table.name) {
                         fromTableName -> {
                             table.name = toTableName
                             table.alias = table.alias ?: Alias(fromTableName)
@@ -216,17 +217,17 @@ class ShardingInterceptor: Interceptor {
                 }
             }
             return null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return null
         }
     }
 
-    private inline fun <reified R: Any> Any.getDeclaredMemberProperty(propertyName: String): R? {
+    private inline fun <reified R : Any> Any.getDeclaredMemberProperty(propertyName: String): R? {
 
         var clazz = this.javaClass as Class<in Any>
         while (clazz != Any::class.java) {
             try {
-               val declaredField = clazz.getDeclaredField(propertyName)
+                val declaredField = clazz.getDeclaredField(propertyName)
                 declaredField.isAccessible = true
                 return declaredField.get(this) as R
             } catch (_: NoSuchFieldException) {

@@ -12,7 +12,7 @@ class CustomShardingTest {
     @BeforeEach
     private fun setUp() {
         sharding = CustomSharding()
-        sharding.setProperties(Properties().apply{
+        sharding.setProperties(Properties().apply {
             this["tableNamePrefix"] = "New_V_FundIO_"
             this["shardingCount"] = "512"
             this["seed"] = "1234ABCD"

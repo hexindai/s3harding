@@ -30,7 +30,7 @@ open class MurmurHashSharding : ConfigurableSharding {
             "Parameter shardingCount and numOfNodes may not less then zero"
         }
         for (i in 0 until shardingCount) {
-            val tableName = "$tableNamePrefix${i+1}"
+            val tableName = "$tableNamePrefix${i + 1}"
             tableNames.add(tableName)
             for (n in 0 until numOfNodesPerTable) {
                 nodes[this.hash("${tableName.toLowerCase()}*$n")] = tableName
@@ -55,10 +55,14 @@ open class MurmurHashSharding : ConfigurableSharding {
     override fun setProperties(properties: Properties?) {
         if (properties == null) throw IllegalArgumentException("Properties for MurmurHashSharing is empty")
         this.properties = properties
-        tableNamePrefix = properties["tableNamePrefix"] as String? ?: throw IllegalArgumentException("Property tableNamePrefix is empty")
-        shardingCount = (properties["shardingCount"] as String?)?.toIntOrNull() ?: throw IllegalArgumentException("Property shardingCount is empty")
-        seed = (properties["seed"] as String?)?.toIntOrNull(16) ?: throw IllegalArgumentException("Property seed is empty")
-        numOfNodesPerTable = (properties["numOfNodesPerTable"] as String?)?.toIntOrNull() ?: throw IllegalArgumentException("Property numOfNodesPerTable is empty")
+        tableNamePrefix = properties["tableNamePrefix"] as String?
+                ?: throw IllegalArgumentException("Property tableNamePrefix is empty")
+        shardingCount = (properties["shardingCount"] as String?)?.toIntOrNull()
+                ?: throw IllegalArgumentException("Property shardingCount is empty")
+        seed = (properties["seed"] as String?)?.toIntOrNull(16)
+                ?: throw IllegalArgumentException("Property seed is empty")
+        numOfNodesPerTable = (properties["numOfNodesPerTable"] as String?)?.toIntOrNull()
+                ?: throw IllegalArgumentException("Property numOfNodesPerTable is empty")
         initThis()
     }
 

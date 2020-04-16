@@ -42,7 +42,7 @@ val dokkaJar by tasks.registering(Jar::class) {
 publishing {
 
     repositories {
-        when(project.findProperty("release")) {
+        when (project.findProperty("release")) {
             "SNAPSHOT" -> maven {
                 name = "OSSRH-SNAPSHOT"
                 url = uri("https://oss.sonatype.org/content/repositories/snapshots")

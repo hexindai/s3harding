@@ -2,7 +2,7 @@ package com.github.hexindai.s3harding.core
 
 import java.util.*
 
-interface ConfigurableSharding: Sharding {
+interface ConfigurableSharding : Sharding {
 
     val numberOfTable: Int
 
