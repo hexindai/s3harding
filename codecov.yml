@@ -1,0 +1,7 @@
+flags:
+  core:
+    paths:
+      - s3harding-core/src
+  mybatis:
+    paths:
+      - s3harding-mybatis/src

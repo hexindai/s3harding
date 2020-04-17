@@ -2,11 +2,13 @@ name: ci-with-gradle
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - '**'
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [ master ]
+    branches:
+      - '**'
     paths-ignore:
       - '**.md'
 
@@ -45,3 +47,7 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+

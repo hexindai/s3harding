@@ -1,6 +1,9 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.dokka")
+    jacoco
     `maven-publish`
     signing
 }
@@ -17,8 +20,12 @@ dependencies {
 }
 
 tasks.test {
-    useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
+    useJUnitPlatform {
+        includeEngines("junit-jupiter")
+    }
     testLogging {
+        exceptionFormat = TestExceptionFormat.FULL
         events("passed", "skipped", "failed")
     }
 }
@@ -26,6 +33,18 @@ tasks.test {
 tasks.dokka {
     outputFormat = "html"
     outputDirectory = "$buildDir/javadoc"
+}
+
+jacoco {
+    toolVersion = "0.8.5"
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = true
+        csv.isEnabled = true
+        html.isEnabled = true
+    }
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
