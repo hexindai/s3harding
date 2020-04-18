@@ -71,9 +71,10 @@ class ShardingInterceptor : Interceptor {
                     sqlCommandType = mappedStatement.sqlCommandType
             )
 
-            val declaredSqlField = BoundSql::class.java.getDeclaredField("sql")
-            declaredSqlField.isAccessible = true
-            declaredSqlField.set(boundSql, boundSqlString)
+            BoundSql::class.java.getDeclaredField("sql").apply {
+                isAccessible = true
+                set(boundSql, boundSqlString)
+            }
         }
         return invocation.proceed()
     }
