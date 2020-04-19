@@ -39,10 +39,9 @@ class ShardingInterceptor : Interceptor {
 
     @Throws(Exception::class)
     override fun intercept(invocation: Invocation): Any {
-        val target = invocation.target
-        var statementHandler = target as StatementHandler
-        if (target is RoutingStatementHandler) {
-            statementHandler = target.getDeclaredMemberProperty("delegate")!!
+        var statementHandler = invocation.target as StatementHandler
+        if (statementHandler is RoutingStatementHandler) {
+            statementHandler = statementHandler.getDeclaredMemberProperty("delegate")!!
         }
         if (statementHandler is BaseStatementHandler) {
             val mappedStatement: MappedStatement = statementHandler.getDeclaredMemberProperty("mappedStatement")!!
